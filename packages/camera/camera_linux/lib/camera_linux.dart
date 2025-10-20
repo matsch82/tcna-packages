@@ -46,6 +46,7 @@ class CameraLinux extends CameraPlatform {
 
   @override
   Future<List<CameraDescription>> availableCameras() async {
+    print('camera_linux availableCameras');
     try {
       final List<String?> cameras = await _hostApi.getAvailableCameras();
 
@@ -71,19 +72,22 @@ class CameraLinux extends CameraPlatform {
     CameraDescription cameraDescription,
     ResolutionPreset? resolutionPreset, {
     bool enableAudio = false,
-  }) =>
-      createCameraWithSettings(
+  }) {
+    print('camera_linux createCamera');
+    return createCameraWithSettings(
           cameraDescription,
           MediaSettings(
             resolutionPreset: resolutionPreset,
             enableAudio: enableAudio,
           ));
+  }
 
   @override
   Future<int> createCameraWithSettings(
     CameraDescription cameraDescription,
     MediaSettings? mediaSettings,
   ) async {
+    print('camera_linux createCameraWithSettings');
     try {
       // If resolutionPreset is not specified, plugin selects the highest resolution possible.
       return await _hostApi.create(
@@ -98,6 +102,8 @@ class CameraLinux extends CameraPlatform {
     int cameraId, {
     ImageFormatGroup imageFormatGroup = ImageFormatGroup.unknown,
   }) async {
+    print('camera_linux initializeCamera');
+
     /// Creates channel for camera events.
     _cameraChannels.putIfAbsent(cameraId, () {
       final MethodChannel channel =
@@ -130,6 +136,7 @@ class CameraLinux extends CameraPlatform {
 
   @override
   Future<void> dispose(int cameraId) async {
+    print('camera_linux dispose');
     await _hostApi.dispose(cameraId);
 
     // Destroy method channel after camera is disposed to be able to handle last messages.
@@ -142,6 +149,8 @@ class CameraLinux extends CameraPlatform {
 
   @override
   Stream<CameraInitializedEvent> onCameraInitialized(int cameraId) {
+    print('camera_linux onCameraInitialized');
+
     return _cameraEvents(cameraId).whereType<CameraInitializedEvent>();
   }
 
@@ -195,6 +204,7 @@ class CameraLinux extends CameraPlatform {
 
   @override
   Future<XFile> takePicture(int cameraId) async {
+    print('camera_linux takePicture');
     final String path = await _hostApi.takePicture(cameraId);
 
     return XFile(path);
@@ -214,6 +224,7 @@ class CameraLinux extends CameraPlatform {
 
   @override
   Future<void> startVideoCapturing(VideoCaptureOptions options) async {
+    print('camera_linux startVideoCapturing');
     if (options.streamCallback != null || options.streamOptions != null) {
       throw UnimplementedError('Streaming is not currently supported on Linux');
     }
@@ -224,6 +235,7 @@ class CameraLinux extends CameraPlatform {
 
   @override
   Future<XFile> stopVideoRecording(int cameraId) async {
+    print('camera_linux stopVideoRecording');
     final String path = await _hostApi.stopVideoRecording(cameraId);
 
     return XFile(path);
@@ -322,11 +334,13 @@ class CameraLinux extends CameraPlatform {
 
   @override
   Future<void> pausePreview(int cameraId) async {
+    print('camera_linux pausePreview');
     await _hostApi.pausePreview(cameraId);
   }
 
   @override
   Future<void> resumePreview(int cameraId) async {
+    print('camera_linux resumePreview');
     await _hostApi.resumePreview(cameraId);
   }
 
@@ -341,6 +355,7 @@ class CameraLinux extends CameraPlatform {
   /// of the plugin as it may break or change at any time.
   @visibleForTesting
   Future<dynamic> handleCameraMethodCall(MethodCall call, int cameraId) async {
+    print('camera_linux handleCameraMethodCall');
     switch (call.method) {
       case 'camera_closing':
         cameraEventStreamController.add(
