@@ -16,6 +16,7 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <stdio>
 
 namespace camera_plugin {
 using flutter::BasicMessageChannel;
@@ -242,6 +243,7 @@ void CameraApi::SetUp(
   const std::string& message_channel_suffix) {
   const std::string prepended_suffix = message_channel_suffix.length() > 0 ? std::string(".") + message_channel_suffix : "";
   {
+    std::cout<<"Setting up CameraApi c part: "<<("dev.flutter.pigeon.camera_linux.CameraApi.getAvailableCameras" + prepended_suffix)<<std::endl;
     BasicMessageChannel<> channel(binary_messenger, "dev.flutter.pigeon.camera_linux.CameraApi.getAvailableCameras" + prepended_suffix, &GetCodec());
     if (api != nullptr) {
       channel.SetMessageHandler([api](const EncodableValue& message, const flutter::MessageReply<EncodableValue>& reply) {
